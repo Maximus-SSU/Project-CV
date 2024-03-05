@@ -8,68 +8,65 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) #убрать предупреждение  InsecureRequestWarning
 
 # Список всех ссылок на  нужные категории
-LINK_DOMEN_UDOCHKI="https://саратов.хищник.рф/catalog/rybalka/udilishcha/?PAGEN_1="
-LINK_DOMEN_KATUSHKI="https://саратов.хищник.рф/catalog/rybalka/katushki/?PAGEN_1="
-LINK_DOMEN_LESKA="https://саратов.хищник.рф/catalog/rybalka/leska-shnury/?PAGEN_1="
-LINK_DOMEN_KOROBKI="https://саратов.хищник.рф/catalog/rybalka/korobki-i-tubusy/korobki/?PAGEN_1="
-LINK_DOMEN_YASCHIKI="https://саратов.хищник.рф/catalog/rybalka/korobki-i-tubusy/yashchiki/?PAGEN_1="
-LINK_DOMEN_NODZI="https://саратов.хищник.рф/catalog/turizm/orudiya-i-instrumenty/nozhi/?PAGEN_1="
-LINK_DOMEN_MULTITOOLS="https://саратов.хищник.рф/catalog/turizm/orudiya-i-instrumenty/instrument/?PAGEN_1="
-LINK_DOMEN_MOTORY="https://саратов.хищник.рф/catalog/lodki-i-motory/lodochnye-motory/lodochnye-motory-dvs/?PAGEN_1="
-LINK_DOMEN_LODKI="https://саратов.хищник.рф/catalog/lodki-i-motory/naduvnye-lodki-pvkh/?PAGEN_1="
-LINK_DOMEN_PALATKI1="https://саратов.хищник.рф/catalog/turizm/palatki-i-pologi/palatki-kempingovye/"
-LINK_DOMEN_PALATKI2="https://саратов.хищник.рф/catalog/turizm/palatki-i-pologi/palatki-turisticheskie/"
-LINK_DOMEN_STULYA="https://саратов.хищник.рф/catalog/turizm/turisticheskaya-mebel/stulya/?PAGEN_1="
-LINK_DOMEN_STOLI="https://саратов.хищник.рф/catalog/turizm/turisticheskaya-mebel/stoly/"
-LINK_DOMEN_KURTKI="https://саратов.хищник.рф/catalog/odezhda-i-obuv/demisezonnaya-odezhda/kurtki/"
-LINK_MODEL_BOTINKI="https://саратов.хищник.рф/catalog/odezhda-i-obuv/obuv/botinki/?PAGEN_1="
-LINK_MODEL_SAPOGI1="https://саратов.хищник.рф/catalog/odezhda-i-obuv/obuv/sapogi-zimnie/"
-LINK_MODEL_SAPOGI2="https://саратов.хищник.рф/catalog/odezhda-i-obuv/obuv/sapogi-rezinovye/"
-LINK_MODEL_SAPOGI3="https://саратов.хищник.рф/catalog/odezhda-i-obuv/obuv/sapogi-zabrodnye/"
-LINK_MODEL_FOOTBOLKI="https://саратов.хищник.рф/catalog/odezhda-i-obuv/letnyaya-odezhda/futbolki/?PAGEN_1="
-
+LINK_CATEGORY_JUICE="https://online.metro-cc.ru/category/bezalkogolnye-napitki/soki-morsy-nektary?page="
+LINK_CATEGORY_WATER="https://online.metro-cc.ru/category/bezalkogolnye-napitki/pityevaya-voda-kulery?page="
+LINK_CATEGORY_CHEESE="https://online.metro-cc.ru/category/molochnye-prodkuty-syry-i-yayca/syry?page="
+LINK_CATEGORY_DAIRY="https://online.metro-cc.ru/category/molochnye-prodkuty-syry-i-yayca/jogurty?page="
+LINK_CATEGORY_OFFICE_MEBEL="https://online.metro-cc.ru/category/ofis-obuchenie-hobbi/tovary-dlya-ofisa/mebel-119001001"
+LINK_CATEGORY_FISH="https://online.metro-cc.ru/category/rybnye/ohlazhdennaya-ryba?page="
+LINK_CATEGORY_BAKERY="https://online.metro-cc.ru/category/hleb-vypechka-torty/hleb-lavash-lepeshki?page="
+LINK_CATEGORY_CANNED_GOODS="https://online.metro-cc.ru/category/bakaleya/konservy?page="
+LINK_CATEGORY_TABLEWARE="https://online.metro-cc.ru/category/tovary-dlya-doma-dachi-sada/posuda/stolovye-pribory?page="
+LINK_CATEGORY_KNIFE="https://online.metro-cc.ru/category/tovary-dlya-doma-dachi-sada/posuda/nozhi-i-razdelochnye-doski/f/tip/nozh?page="
+LINK_CATEGORY_TOWEL="https://online.metro-cc.ru/category/tovary-dlya-doma-dachi-sada/domashniy-tekstil/polotentsa-khalaty-tapochki?page="
+LINK_CATEGORY_CUPS="https://online.metro-cc.ru/category/tovary-dlya-doma-dachi-sada/posuda/posuda-dlya-chaya-i-kofe?page="
 # Основная ссылка на сайт
-MAIN_LINK_DOMEN="https://саратов.хищник.рф"
+# LINK_PRODUCT_DOMEN="https://leroymerlin.ru/product/"
+# LINK_UPLOAD_DOMEN="https://cdn.leroymerlin.ru/lmru/image/upload/"
+MAIN_LINK_DOMEN="https://online.metro-cc.ru"
+
 
 # #получаем готовый Url необходимой страницы для BS4, параметр verify можно отключить, в зависимости от сайта
 def getNewUrl(newUrl):
-    r=requests.get(newUrl,verify=False)
-    return r.text
-
-
+    r=requests.get(newUrl)
+    if r.status_code==200:
+        # print(f"\nSUCCESS - Status CODE: = {r.status_code}")
+        return r.text
+    else:
+        print(f"\nERROR - Status CODE: = {r.status_code}")
+        return r.text
 
 
 # парсим каждую страницу
 def ParsePage(soup, item_group):
-    soup=soup.find('div', class_="catalog_block")
-    rawLinks=soup.findAll('a') #Список всех картинок
-    for rawLink in rawLinks:
-        rawLink_link= rawLink.get('href') 
-        picture_link= rawLink.find('img')
+    soup=soup.find('div', class_="subcategory-or-type__products")
+    rawData=soup.findAll('a') #Список всех картинок
+    for element in rawData:
+        element_link= element.get('href') 
+        element_title= element.get('title')
+        picture_link= element.find('img')
         if picture_link is not None:
 
             # debug MODE:
             #####################################################################
             # count+=1
             # print("\n________________________________________________________")
+ 
             # print("\n********************************************************")
-            # print(count)
-            # print("\n********************************************************")
-            # print(rawLink)
+            # print(element_link)
             # print("\n********************************************************")
             # print(picture_link)
             # print("\n********************************************************")
-             #####################################################################
-            pictureLink_title= picture_link.get('title')
-            pictureLink_upload_raw=picture_link.get('src')
-            pictureLink_upload=MAIN_LINK_DOMEN+pictureLink_upload_raw
-            preparedlink=MAIN_LINK_DOMEN+rawLink_link
-            preparedLinks.append([item_group,pictureLink_title,preparedlink,pictureLink_upload])
+             ####################################################################
+            picture_link_upload=picture_link.get('src')
+            prepared_element_link=MAIN_LINK_DOMEN+element_link
+            preparedLinks.append([item_group,element_title,prepared_element_link,picture_link_upload])
     # rawLinks_length=len(rawLinks)# количество всех ссылок
         # if rawLinks_length==21 :
         #     return True
         # else :
         #     return False
+
 
 
 
@@ -103,25 +100,18 @@ def CreateLinkDocument(ListOut):
 
 preparedLinks=[]
 start_DATA=[
-    (LINK_DOMEN_UDOCHKI,"Удилища",10),
-    (LINK_DOMEN_KATUSHKI,"Катушки",10),
-    (LINK_DOMEN_LESKA,"Леска",5),
-    (LINK_DOMEN_KOROBKI,"Коробки",5),
-    (LINK_DOMEN_YASCHIKI,"Ящики", 2),
-    (LINK_DOMEN_NODZI,"Ножи", 5),
-    (LINK_DOMEN_MULTITOOLS,"Мультитулы", 3),
-    (LINK_DOMEN_MOTORY,"Моторы",2),
-    (LINK_DOMEN_LODKI,"Лодки",2),
-    (LINK_DOMEN_PALATKI1,"Палатки",0),
-    (LINK_DOMEN_PALATKI2,"Палатки",0),
-    (LINK_DOMEN_STULYA,"Стулья",2),
-    (LINK_DOMEN_STOLI,"Столы",0),
-    (LINK_DOMEN_KURTKI,"Куртки",0),
-    (LINK_MODEL_BOTINKI,"Ботинки",2),
-    (LINK_MODEL_SAPOGI1,"Сапоги",0),
-    (LINK_MODEL_SAPOGI2,"Сапоги",0),
-    (LINK_MODEL_SAPOGI3,"Сапоги",0),
-    (LINK_MODEL_FOOTBOLKI,"Футболки",2)
+    (LINK_CATEGORY_JUICE,"Соки",3),
+    (LINK_CATEGORY_WATER,"Вода",3),
+    (LINK_CATEGORY_CHEESE,"Сыры",3),
+    (LINK_CATEGORY_CHEESE,"Йогурты",3),
+    (LINK_CATEGORY_OFFICE_MEBEL,"Офисная мебель",0),
+    (LINK_CATEGORY_FISH,"Рыба",3),
+    (LINK_CATEGORY_BAKERY,"Хлеб",3),
+    (LINK_CATEGORY_CANNED_GOODS,"Консервы",5),
+    (LINK_CATEGORY_TABLEWARE,"Столовые приборы",3),
+    (LINK_CATEGORY_KNIFE,"Ножи",3),
+    (LINK_CATEGORY_TOWEL,"Полотенца",3),
+    (LINK_CATEGORY_CUPS,"Чашки",3)
     ]
 
 k=len(start_DATA)
